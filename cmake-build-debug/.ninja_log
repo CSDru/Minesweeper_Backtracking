@@ -1,0 +1,10 @@
+# ninja log v5
+7	427	7511988511869694	CMakeFiles/Minesweeper_Backtracking.dir/Model.cpp.obj	6739306ce1e382a
+10	403	7512021309603394	CMakeFiles/Minesweeper_Backtracking.dir/Controller.cpp.obj	40c431426ee6f2ae
+0	451	7511923130498745	CMakeFiles/Minesweeper_Backtracking.dir/Node.cpp.obj	5fcdeb1bb217ec48
+7	586	7512021311435364	CMakeFiles/Minesweeper_Backtracking.dir/View.cpp.obj	df4074d2a1bc282
+10	602	7511923132008450	CMakeFiles/Minesweeper_Backtracking.dir/SpriteSheetCutter.cpp.obj	287256c5a2835c78
+3	593	7512021311505975	CMakeFiles/Minesweeper_Backtracking.dir/main.cpp.obj	5e5d81edfe916adc
+467	892	7511994373077199	Minesweeper_Backtracking.exe	ee4551e4f4728668
+2	420	7512022659001838	CMakeFiles/Minesweeper_Backtracking.dir/Fonts.cpp.obj	df8929865d4b84cc
+421	917	7512022663919349	Minesweeper_Backtracking.exe	20c5b5e1f43ab9ed
