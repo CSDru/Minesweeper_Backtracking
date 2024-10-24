@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -static")
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES main.cpp Node.cpp Node.h Controller.cpp Controller.h Model.cpp Model.h SpriteSheetCutter.cpp View.cpp View.h Fonts.cpp)
+set(SOURCE_FILES main.cpp SpriteSheetCutter.cpp Fonts.cpp Model.cpp Model.h View.cpp View.h Controller.cpp Controller.h)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})

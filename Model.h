@@ -1,40 +1,71 @@
 //
-// Created by Dru on 10/20/2024.
+// Created by Dru on 10/22/2024.
 //
 
 #ifndef MINESWEEPER_BACKTRACKING_MODEL_H
 #define MINESWEEPER_BACKTRACKING_MODEL_H
 
 #include <vector>
-#include <string>
-#include "Node.h"
+
+// Tile struct represents each tile on the Minesweeper grid
+struct Tile
+{
+    bool isBomb = false;
+    bool isRevealed = false;
+    bool isFlagged = false;
+    bool isClicked = false;
+    int neighboringBombs = 0;
+};
+
+// Enum for the game state: Ongoing, Won, or Lost
+enum class GameState { Ongoing, Won, Lost };
 
 class Model
 {
 private:
-    std::vector<std::vector<std::string>> board; // 2D vector for the Minesweeper grid
-    std::vector<Node> nodes; // Nodes representing numbered squares on the board
+    int rows;
+    int cols;
+    int bombCount;
+    bool firstClick = true;
+    bool isPaused = false;
+    GameState gameState = GameState::Ongoing;
 
 public:
-    Model(int rows, int cols, const std::vector<std::vector<std::string>>& boardSetup);
+    // Constructor with optional default values
+    Model(int rows = 16, int cols = 16, int bombCount = 40);
 
-    // Accessor for the board
-    std::vector<std::vector<std::string>>& getBoard();
+    // Function to place bombs, excluding the area around the first click
+    void placeBombs(int startRow, int startCol);
 
-    // Accessor for the nodes
-    std::vector<Node>& getNodes();
+    // Function to calculate the number of neighboring bombs for each tile
+    void calculateNeighboringBombs();
 
-    // Modify the board (e.g., place a bomb)
-    void placeBomb(int x, int y);
+    // Utility function to check if a tile is within the bounds of the grid
+    bool isInBounds(int row, int col) const;
 
-    // Remove a bomb (for backtracking)
-    void removeBomb(int x, int y);
+    // Function to reveal a tile, handling the game's reveal logic and win/loss conditions
+    void revealTile(int row, int col);
 
-    // Check if the board is fully solved
-    bool isSolved();
+    // Function to toggle flagging on a tile
+    void flagTile(int row, int col);
 
-    // Print the current state of the board (for debugging)
-    void printBoard();
+    // Reset the game to the initial state
+    void resetGame();
+
+    // Function to check if the player has won the game
+    bool checkWinCondition();
+
+    // Toggle the paused state of the game
+    void togglePause() { isPaused = !isPaused; }
+
+    // Retrieve the current paused state
+    bool getPausedState() const { return isPaused; }
+
+    // Retrieve the current game state (Ongoing, Won, or Lost)
+    GameState getGameState() const { return gameState; }
+
+    // 2D grid representing the Minesweeper board
+    std::vector<std::vector<Tile>> grid;
 };
 
-#endif //MINESWEEPER_BACKTRACKING_MODEL_H
+#endif  // MINESWEEPER_BACKTRACKING_MODEL_H
