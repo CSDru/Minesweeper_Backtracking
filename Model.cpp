@@ -118,6 +118,7 @@ void Model::revealTile(int row, int col)
     // If the tile is a bomb, the game is lost
     if (grid[row][col].isBomb)
     {
+        grid[row][col].isClicked = true;
         gameState = GameState::Lost;
 
         for (int r = 0; r < rows; ++r)
@@ -184,4 +185,54 @@ void Model::resetGame()
     grid.resize(rows, std::vector<Tile>(cols));  // Reinitialize the grid
     firstClick = true;  // Allow bombs to be placed again after reset
     gameState = GameState::Ongoing;  // Set game state back to ongoing
+}
+
+void Model::revealNumberedTiles()
+{
+    if(firstClick)
+    {
+        placeBombs(0,0);
+    }
+    for (int row = 0; row < rows; ++row)
+    {
+        for (int col = 0; col < cols; ++col)
+        {
+            if (grid[row][col].neighboringBombs > 0 && !grid[row][col].isRevealed)
+            {
+                grid[row][col].isRevealed = true;  // Reveal numbered tiles
+            }
+        }
+    }
+}
+
+std::vector<std::pair<int, int>> Model::getNeighbors(int row, int col) const
+{
+    std::vector<std::pair<int, int>> neighbors;
+
+    // Check all eight potential neighbors
+    for (int i = -1; i <= 1; ++i)
+    {
+        for (int j = -1; j <= 1; ++j)
+        {
+            if (i == 0 && j == 0) continue; // Skip teh current tile
+
+            int newRow = row + i;
+            int newCol = col + j;
+
+            // Check bounds
+            if (isInBounds(newRow, newCol))
+            {
+                neighbors.emplace_back(newRow, newCol);
+            }
+        }
+    }
+    return neighbors;
+}
+
+void Model::highlightTile(int row, int col, bool highlight)
+{
+    if (isInBounds(row, col))
+    {
+        grid[row][col].isHighlighted = highlight;
+    }
 }

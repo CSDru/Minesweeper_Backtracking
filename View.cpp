@@ -130,12 +130,12 @@ void View::updateEmoji()
 
 void View::drawBoard()
 {
-
+    std::vector<std::vector<Tile>> grid = board.getGrid();
     for (int row = 0; row < 16; ++row)
     {
         for (int col = 0; col < 16; ++col)
         {
-            const Tile& tile = board.grid[row][col];
+            const Tile& tile = grid[row][col];
 
             if (tile.isRevealed)
             {
@@ -172,6 +172,15 @@ void View::drawBoard()
 
             boardSprite.setPosition(col * 65, (row + 1) * 65);
             window.draw(boardSprite);
+
+            // Check if the tile is currently highlighted
+            if (tile.isHighlighted)
+            {
+                sf::RectangleShape highlight(sf::Vector2f(65,65));
+                highlight.setPosition(col * 65, (row + 1) * 65);
+                highlight.setFillColor(sf::Color(225, 225, 0, 128)); // Semi-transparent yellow
+                window.draw(highlight);
+            }
         }
     }
 }
@@ -333,12 +342,12 @@ void View::handleHover(int mouseX, int mouseY)
 
 void View::displaySolvedBoard()
 {
-
+    std::vector<std::vector<Tile>> grid = board.getGrid();
     for (int row = 0; row < 16; ++row)
     {
         for(int col = 0; col < 16; ++col)
         {
-            const Tile& tile = board.grid[row][col];
+            const Tile& tile = grid[row][col];
 
             if (tile.isRevealed)
             {

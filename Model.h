@@ -6,6 +6,7 @@
 #define MINESWEEPER_BACKTRACKING_MODEL_H
 
 #include <vector>
+#include "Node.h"
 
 // Tile struct represents each tile on the Minesweeper grid
 struct Tile
@@ -14,6 +15,7 @@ struct Tile
     bool isRevealed = false;
     bool isFlagged = false;
     bool isClicked = false;
+    bool isHighlighted = false;
     int neighboringBombs = 0;
 };
 
@@ -28,6 +30,7 @@ private:
     int bombCount;
     bool firstClick = true;
     bool isPaused = false;
+    std::vector<std::vector<Tile>> grid;
     GameState gameState = GameState::Ongoing;
 
 public:
@@ -64,8 +67,16 @@ public:
     // Retrieve the current game state (Ongoing, Won, or Lost)
     GameState getGameState() const { return gameState; }
 
-    // 2D grid representing the Minesweeper board
-    std::vector<std::vector<Tile>> grid;
+    // Retrieve the grid representing the Minesweeper board
+    const std::vector<std::vector<Tile>>& getGrid() const { return grid; }
+
+    /// Recursion
+    void revealNumberedTiles();
+    int getRows() const { return rows; }
+    int getCols() const { return cols; }
+    std::vector<std::pair<int, int>> getNeighbors(int row, int col) const;
+    void highlightTile(int row, int col, bool highlight);
+    void setGameState(GameState state) { gameState = state; }
 };
 
 #endif  // MINESWEEPER_BACKTRACKING_MODEL_H

@@ -7,8 +7,6 @@
 
 Controller::Controller(Model& board, View& view) : board(board), view(view){}
 
-bool pauseToggleHandled = false; // Prevent double-toggle
-
 void Controller::handleInput()
 {
     sf::Event event;
@@ -61,7 +59,8 @@ void Controller::handleInput()
                     if (event.mouseButton.button == sf::Mouse::Left)
                     {
                         board.revealTile(row, col); // Reveal clicked tile
-                    } else if (event.mouseButton.button == sf::Mouse::Right)
+                    }
+                    else if (event.mouseButton.button == sf::Mouse::Right)
                     {
                         board.flagTile(row, col);
                     }
@@ -102,9 +101,10 @@ void Controller::handlePauseMenu(sf::Event& event)
         // Handle clicking the Solve button box
         if (view.getSolveButtonBox().getGlobalBounds().contains(mouseX, mouseY))
         {
-            // Placeholder for Solve button action
             board.togglePause();  // Close the pause menu after solving
             view.resetButtonStates(); // Reset hover state
+            board.revealNumberedTiles(); // Reveal only the numbered tiles
+            solveBoard(); // Activate solving algorithm
         }
 
         // Handle clicking the Quit button box
@@ -125,6 +125,125 @@ void Controller::handlePauseMenu(sf::Event& event)
         {
             board.togglePause();  // Close the pause menu if clicked outside
             view.resetButtonStates(); // Reset hover state
+        }
+    }
+}
+
+// Recursive backtracking method to test bomb placements
+bool Controller::backtrackBombPlacement(Node& node, std::vector<std::vector<std::pair<int, int>>>& combinations, int index)
+{
+    sf::Window& window = view.getWindow();
+    if (index >= combinations.size())
+    {
+        return false; // No more combinations to try -> backtrack
+    }
+
+    // Highlight the current tile
+    board.highlightTile(node.getCoordinate().first, node.getCoordinate().second, true);
+
+    // Draw the updated board with highlighted tile
+    view.drawBoard();
+    window.display();
+
+    // Add a small delay to slow down algorithm for visualization
+    sf::sleep(sf::milliseconds(200));
+
+    // Try the current combination
+    std::vector<std::pair<int, int>> currentPlacement = combinations[index];
+
+    // Toggle the flag for the locations
+    toggleFlags(currentPlacement);
+
+    // Check if the placement is valid
+    bool valid = isValidPlacement(combinations[index]);
+
+    // Draw the board
+    view.drawBoard();
+    window.display();
+
+    // Add a small delay to slow down algorithm for visualization
+    sf::sleep(sf::milliseconds(200));
+
+    if (valid)
+    {
+        // Unhighlight the current tile after processing
+        board.highlightTile(node.getCoordinate().first, node.getCoordinate().second, false);
+
+        return true;
+    }
+    else
+    {
+        // Backtrack by removing the bombs and tyring the next combination
+        toggleFlags(currentPlacement);
+
+        // Unhighlight the current tile after processing
+        board.highlightTile(node.getCoordinate().first, node.getCoordinate().second, false);
+
+        return backtrackBombPlacement(node, combinations, index + 1);
+    }
+}
+
+bool Controller::isValidPlacement(const std::vector<std::pair<int, int>> &placement)
+{
+    for (const auto& coord : placement)
+    {
+        int row = coord.first;
+        int col = coord.second;
+
+        // Count flagged neighbors
+        int flaggedCount = 0;
+        for (const auto& neighbor : board.getNeighbors(row, col))
+        {
+            if (board.getGrid()[neighbor.first][neighbor.second].isFlagged)
+            {
+                flaggedCount++;
+            }
+        }
+
+        // If flagged tiles don't match expected bombs, return false
+        if (flaggedCount != board.getGrid()[row][col].neighboringBombs)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Controller::toggleFlags(const std::vector<std::pair<int, int>> &tiles)
+{
+    for (const auto& tile : tiles)
+    {
+        board.flagTile(tile.first, tile.second); // Toggle Flag
+    }
+}
+
+void Controller::solveBoard()
+{
+    bool solved = true;
+
+    for (int row = 0; row < board.getRows(); ++row)
+    {
+        for(int col = 0; col < board.getCols(); ++col)
+        {
+            // Check if the tile is a numbered tile
+            if (board.getGrid()[row][col].neighboringBombs > 0)
+            {
+                std::vector<std::pair<int, int>> neighbors = board.getNeighbors(row, col);
+                Node node({row, col});
+                std::vector<std::vector<std::pair<int, int>>> combinations = node.generateBombPlacements(neighbors, board.getGrid()[row][col].neighboringBombs);
+
+                // Run backtracking algorithm
+                if (!backtrackBombPlacement(node, combinations, 0))
+                {
+                    solved = false; // If no valid solution, board is unsolvable
+                }
+            }
+        }
+
+        // if algorithm i successful, Win game
+        if (solved)
+        {
+            board.setGameState(GameState::Won);
         }
     }
 }

@@ -21,6 +21,13 @@ public:
     void handleInput();
 
     void handlePauseMenu(sf::Event &event);
+
+    /// Backtracking
+    bool backtrackBombPlacement(Node& node, std::vector<std::vector<std::pair<int, int>>>& combinations, int index);
+    bool isValidPlacement(const std::vector<std::pair<int, int>>& placement);
+    void toggleFlags(const std::vector<std::pair<int, int>>& tiles);
+    void solveBoard();
+
 };
 
 
